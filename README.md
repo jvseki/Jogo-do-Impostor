@@ -1,7 +1,7 @@
-🎭 Jogo do Impostor
+# 🎭 Jogo do Impostor
 O Jogo do Impostor é uma aplicação web interativa desenvolvida para transformar qualquer reunião de amigos em um desafio de dedução social. Inspirado em mecânicas de jogos clássicos, o app utiliza tecnologia web moderna para oferecer uma experiência fluida diretamente no navegador do celular.
 
-🚀 Funcionalidades Principais
+# 🚀 Funcionalidades Principais
 Gerenciamento Dinâmico de Jogadores: Adicione ou remova participantes de forma simples através da interface.
 
 Inteligência de Temas: Algoritmo de sorteio que impede a repetição de palavras antes que todo o baralho seja utilizado.
@@ -14,14 +14,14 @@ Persistência de Dados (localStorage): Nomes e configurações permanecem salvos
 
 Design Responsivo: Interface otimizada para dispositivos móveis com efeitos de Glassmorphism e transições suaves.
 
-🛠️ Tecnologias Utilizadas
+# 🛠️ Tecnologias Utilizadas
 Backend: Flask (Python) para gerenciamento de rotas e lógica de jogo.
 
 Frontend: HTML5 semântico e CSS3 com variáveis modernas para estilização.
 
 Lógica de Cliente: JavaScript Vanilla para manipulação do DOM e persistência local.
 
-⚙️ Como Executar o Projeto
+# ⚙️ Como Executar o Projeto
 Clone este repositório:
 
 Bash
@@ -44,7 +44,7 @@ No computador: http://127.0.0.1:5000
 
 No celular (Rede Local): O endereço IP específico para acesso via Wi-Fi será exibido no seu terminal ao iniciar o servidor.
 
-📝 Regras do Jogo
+# 📝 Regras do Jogo
 O Segredo: Cada jogador deve clicar em seu nome para revelar seu papel em segredo e passar o celular adiante.
 
 O Impostor: Enquanto a maioria recebe um Tema, o(s) impostor(es) recebem apenas a mensagem de que são os infiltrados.
