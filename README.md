@@ -12,45 +12,58 @@ Suporte Multi-Impostor: Configuração ajustável para partidas com 1 ou 2 impos
 
 Persistência de Dados (localStorage): Nomes e configurações permanecem salvos mesmo se a página for atualizada, facilitando o início de novas rodadas.
 
-Design Responsivo: Interface otimizada para dispositivos móveis com efeitos de Glassmorphism e transições suaves.
+Design Responsivo: Interface otimizada para dispositivos móveis com efeitos de Glassmorphism.
 
 # 🛠️ Tecnologias Utilizadas
 Backend: Flask (Python) para gerenciamento de rotas e lógica de jogo.
 
-Frontend: HTML5 semântico e CSS3 com variáveis modernas para estilização.
+Frontend: HTML5 semântico e CSS3 com variáveis modernas.
 
-Lógica de Cliente: JavaScript Vanilla para manipulação do DOM e persistência local.
+Lógica de Cliente: JavaScript Vanilla para manipulação do DOM e persistência local via localStorage.
 
-# ⚙️ Como Executar o Projeto
+# ⚙️ Instalação e Execução Local
 Clone este repositório:
 
 Bash
 
-git clone https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git
-cd NOME_DO_REPOSITORIO
-Instale as dependências necessárias:
+git clone https://github.com/jvseki/Jogo-do-impostor.git
+cd Jogo-do-impostor
+Instale o Flask:
 
 Bash
 
 pip install flask
-Inicie o servidor local:
+Inicie o servidor:
 
 Bash
 
 python app.py
-Acesse o jogo:
+# 🌐 Como Jogar com Amigos (Acesso Externo)
+Para disponibilizar o jogo para pessoas fora da sua rede Wi-Fi, este projeto foi testado com duas abordagens:
 
-No computador: http://127.0.0.1:5000
+# ⚡ Teste Rápido (ngrok)
+Ideal para partidas imediatas onde o servidor roda do seu computador:
 
-No celular (Rede Local): O endereço IP específico para acesso via Wi-Fi será exibido no seu terminal ao iniciar o servidor.
+Com o Flask ativo, execute: ngrok http 5000.
+
+O ngrok criará um túnel seguro fornecendo uma URL temporária https.
+
+Compartilhe o link gerado para que seus amigos acessem pelo 4G/5G.
+
+# ☁️ Hospedagem Permanente (PythonAnywhere)
+Para manter o jogo online 24h sem depender do seu computador ligado:
+
+O projeto é totalmente compatível com o PythonAnywhere.
+
+Basta realizar o upload dos arquivos, configurar o ambiente virtual Flask e recarregar o Web App para ter seu próprio domínio jvseki.pythonanywhere.com.
 
 # 📝 Regras do Jogo
-O Segredo: Cada jogador deve clicar em seu nome para revelar seu papel em segredo e passar o celular adiante.
+Distribuição: Cada jogador deve clicar em seu nome para revelar seu papel em segredo e passar o celular adiante.
 
 O Impostor: Enquanto a maioria recebe um Tema, o(s) impostor(es) recebem apenas a mensagem de que são os infiltrados.
 
-A Discussão: O grupo debate para identificar contradições. O objetivo do grupo é encontrar o impostor; o do impostor é descobrir o tema ou sobreviver à votação.
+Discussão: O grupo debate para identificar contradições. O objetivo do grupo é encontrar o impostor; o do impostor é descobrir o tema ou sobreviver à votação.
 
-A Revelação: Após a votação, a tela de revelação mostra o tema real e quem eram os impostores da rodada.
+Revelação: Após a votação, a tela de revelação mostra o tema real e quem eram os impostores da rodada.
 
-Desenvolvido para proporcionar diversão e integração entre amigos.
+Desenvolvido por jvseki para proporcionar diversão e integração entre amigos.
