@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Discussão</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container center"
+     id="box"
+     data-jogadores='{{ session["jogadores"] | tojson }}'>
+
+    <h1>💬 Discussão</h1>
+
+    <p style="opacity:0.8; margin-bottom:12px">
+        Os jogadores devem discutir para descobrir quem é o impostor
+    </p>
+
+    <h2>🗣️ Começa falando:</h2>
+    <h1 id="jogador"></h1>
+
+    <div class="action-area">
+        <a href="/revelar" class="btn">🏁 Fim de jogo</a>
+    </div>
+</div>
+
+<script>
+/* ===== BLOQUEAR BOTÃO VOLTAR ===== */
+window.history.pushState(null, "", window.location.href);
+window.onpopstate = function () {
+    window.history.pushState(null, "", window.location.href);
+    alert("🚫 Não é possível voltar durante a partida!");
+};
+
+/* ===== SORTEAR JOGADOR ===== */
+const box = document.getElementById("box");
+const jogadores = JSON.parse(box.dataset.jogadores);
+
+const sorteado = jogadores[Math.floor(Math.random() * jogadores.length)];
+document.getElementById("jogador").innerText = sorteado;
+</script>
+
+</body>
+</html>

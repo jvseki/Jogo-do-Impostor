@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/style.css">
+<title>Jogo do Impostor</title>
+</head>
+<body>
+
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h1>🎭 Jogo do Impostor</h1>
+        <button type="button" onclick="resetarTudo()" style="background:none; border:none; font-size:20px; cursor:pointer;" title="Limpar dados">
+            🗑️
+        </button>
+    </div>
+
+    <form method="post" action="/comecar" onsubmit="salvarDados()">
+
+        <div id="players"></div>
+
+        <div class="player-controls">
+            <button type="button" class="btn-circle" onclick="addPlayer()">+</button>
+            <button type="button" class="btn-circle danger" onclick="removePlayer()">−</button>
+        </div>
+
+        <h2>Modo</h2>
+        <select name="modo" id="modoSelect" onchange="toggleTema(this.value)">
+            <option value="classico">Clássico</option>
+            <option value="personalizado">Personalizado</option>
+        </select>
+
+        <div id="temaBox" style="display:none">
+            <textarea name="temas" id="temasInput" placeholder="Temas separados por vírgula"></textarea>
+        </div>
+
+        <h2>Impostores</h2>
+        <select name="impostores" id="impostoresSelect" onchange="validarImpostor(this.value)">
+            <option value="1">1 Impostor</option>
+            <option value="2">2 Impostores</option>
+        </select>
+
+        <button class="btn start-btn">▶️ Começar</button>
+    </form>
+</div>
+
+<script>
+    // Inicializa com 3 campos vazios por padrão
+    let players = ["", "", ""];
+
+    // ===== FUNÇÃO: RENDERIZAR INPUTS =====
+    function render() {
+        const div = document.getElementById("players");
+        div.innerHTML = "";
+        players.forEach((p, i) => {
+            // Cria o input e garante que o valor seja atualizado no array 'players' ao digitar
+            div.innerHTML += `<input name="jogadores" value="${p}" placeholder="Jogador ${i+1}" required 
+            oninput="atualizarNome(${i}, this.value)">`;
+        });
+    }
+
+    // Atualiza o array players quando o usuário digita
+    function atualizarNome(index, valor) {
+        players[index] = valor;
+        salvarDados(); // Salva em tempo real (opcional, mas bom pra segurança)
+    }
+
+    // ===== CONTROLES DE JOGADORES =====
+    function addPlayer() {
+        if (players.length < 15) {
+            players.push("");
+            render();
+            salvarDados();
+        }
+    }
+
+    function removePlayer() {
+        if (players.length > 3) {
+            players.pop();
+            render();
+            salvarDados();
+        }
+    }
+
+    // ===== LÓGICA DE TEMA E IMPOSTOR =====
+    function toggleTema(v) {
+        document.getElementById("temaBox").style.display = v === "personalizado" ? "block" : "none";
+        salvarDados();
+    }
+
+    function validarImpostor(v) {
+        if (v == 2 && players.length < 7) {
+            alert("🚫 Para 2 impostores é necessário no mínimo 7 jogadores");
+            document.getElementById("impostoresSelect").value = "1";
+        }
+        salvarDados();
+    }
+
+    // ===== SALVAR E CARREGAR (localStorage) =====
+    
+    function salvarDados() {
+        const dados = {
+            listaJogadores: players,
+            modo: document.getElementById("modoSelect").value,
+            temas: document.getElementById("temasInput").value,
+            qtdImpostores: document.getElementById("impostoresSelect").value
+        };
+        // Salva tudo no navegador do celular
+        localStorage.setItem("impostorData", JSON.stringify(dados));
+    }
+
+    function carregarDados() {
+        const dadosSalvos = localStorage.getItem("impostorData");
+        
+        if (dadosSalvos) {
+            const dados = JSON.parse(dadosSalvos);
+
+            // 1. Recupera jogadores
+            if (dados.listaJogadores && dados.listaJogadores.length > 0) {
+                players = dados.listaJogadores;
+                // Garante que tenha pelo menos 3 campos mesmo se salvou errado
+                while (players.length < 3) players.push(""); 
+            }
+
+            // 2. Recupera Modo
+            if (dados.modo) {
+                document.getElementById("modoSelect").value = dados.modo;
+                toggleTema(dados.modo);
+            }
+
+            // 3. Recupera Temas
+            if (dados.temas) {
+                document.getElementById("temasInput").value = dados.temas;
+            }
+
+            // 4. Recupera Qtd Impostores
+            if (dados.qtdImpostores) {
+                document.getElementById("impostoresSelect").value = dados.qtdImpostores;
+            }
+        }
+    }
+
+    // Função para o botão de lixeira (Resetar)
+    function resetarTudo() {
+        if(confirm("Deseja limpar todos os nomes e configurações?")) {
+            localStorage.removeItem("impostorData");
+            location.reload(); // Recarrega a página zerada
+        }
+    }
+
+    // ===== INICIALIZAÇÃO =====
+    // Tenta carregar dados salvos ao abrir a página
+    carregarDados();
+    render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container center">
+<h1>🏁 Fim de Jogo</h1>
+
+<p>🎯 Tema:</p>
+<h2>{{ palavra }}</h2>
+
+<p>🕵️ Impostores:</p>
+<h2>{{ impostores }}</h2>
+
+<a href="/recomecar" class="btn">🔁 Recomeçar</a>
+<a href="/" class="btn">🏠 Início</a>
+</div>
+
+<script>
+window.history.pushState(null,"",location.href);
+window.onpopstate=function(){
+window.history.pushState(null,"",location.href);
+alert("🚫 Não é possível voltar durante a partida!");
+};
+</script>
+
+</body>
+</html>

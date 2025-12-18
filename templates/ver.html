@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="/static/style.css">
+<title>Sua vez</title>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- TELA BLOQUEADA (SUSPENSE) -->
+    <div id="lock" class="center">
+        <h2>🔒 Jogador:</h2>
+        <h1>{{ jogador }}</h1>
+
+        <p style="opacity:0.8">Toque para revelar seu papel</p>
+        <p style="font-size:14px; opacity:0.6">
+            Passe o celular com cuidado
+        </p>
+    </div>
+
+    <!-- TELA REVELADA -->
+    <div id="secret" class="center" style="display:none">
+        <h1>{{ mensagem }}</h1>
+
+        <div class="action-area">
+            {% if ultimo %}
+                <a class="btn" href="/discussao">🗣️ Ir para discussão</a>
+            {% else %}
+                <a class="btn" href="/proximo">➡️ Próximo jogador</a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* ===== BLOQUEAR BOTÃO VOLTAR ===== */
+window.history.pushState(null, "", window.location.href);
+window.onpopstate = function () {
+    window.history.pushState(null, "", window.location.href);
+    alert("🚫 Não é possível voltar durante a partida!");
+};
+
+/* ===== CONTROLE DE SUSPENSE ===== */
+const lock = document.getElementById("lock");
+const secret = document.getElementById("secret");
+
+lock.onclick = () => {
+    lock.style.display = "none";
+    secret.style.display = "flex";
+};
+</script>
+
+</body>
+</html>
