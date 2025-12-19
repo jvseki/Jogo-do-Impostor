@@ -41,32 +41,56 @@
             <option value="2">2 Impostores</option>
         </select>
 
-        <button class="btn start-btn">▶️ Começar</button>
+        <button class="btn start-btn">▶️ Começar Solo</button>
     </form>
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #444;">
+    
+    <button type="button" onclick="avisoOnline()" class="btn" style="background: linear-gradient(135deg, #00d4ff 0%, #0055ff 100%); color: white; border: none; font-weight: bold;">
+        🌍 JOGAR ONLINE (BETA)
+    </button>
 </div>
 
 <script>
-    // Inicializa com 3 campos vazios por padrão
+    // ===== FUNÇÃO DO ALERTA ONLINE QUE VOCÊ PEDIU =====
+    function avisoOnline() {
+        const mensagem = 
+`⚠️ MODO ONLINE - LEIA COM ATENÇÃO ⚠️
+
+Bem-vindo ao modo Multiplayer!
+
+1. ERROS PODEM OCORRER: O modo ainda está em testes.
+2. COMUNICAÇÃO: O jogo NÃO tem áudio. Use Discord, WhatsApp ou jogue presencialmente.
+3. COMO JOGAR:
+   - O LÍDER (👑) cria a sala e inicia a partida.
+   - O tema aparece na tela de cada um.
+   - O Líder clica em "Ir para Discussão" e a roleta sorteia quem fala primeiro.
+   - Vocês debatem na vida real e votam.
+
+Deseja continuar?`;
+
+        if(confirm(mensagem)) {
+            window.location.href = "/online";
+        }
+    }
+
+    // ===== SEU SCRIPT ORIGINAL DO MODO SOLO (MANTIDO) =====
     let players = ["", "", ""];
 
-    // ===== FUNÇÃO: RENDERIZAR INPUTS =====
     function render() {
         const div = document.getElementById("players");
         div.innerHTML = "";
         players.forEach((p, i) => {
-            // Cria o input e garante que o valor seja atualizado no array 'players' ao digitar
             div.innerHTML += `<input name="jogadores" value="${p}" placeholder="Jogador ${i+1}" required 
             oninput="atualizarNome(${i}, this.value)">`;
         });
     }
 
-    // Atualiza o array players quando o usuário digita
     function atualizarNome(index, valor) {
         players[index] = valor;
-        salvarDados(); // Salva em tempo real (opcional, mas bom pra segurança)
+        salvarDados();
     }
 
-    // ===== CONTROLES DE JOGADORES =====
     function addPlayer() {
         if (players.length < 15) {
             players.push("");
@@ -83,7 +107,6 @@
         }
     }
 
-    // ===== LÓGICA DE TEMA E IMPOSTOR =====
     function toggleTema(v) {
         document.getElementById("temaBox").style.display = v === "personalizado" ? "block" : "none";
         salvarDados();
@@ -97,8 +120,6 @@
         salvarDados();
     }
 
-    // ===== SALVAR E CARREGAR (localStorage) =====
-    
     function salvarDados() {
         const dados = {
             listaJogadores: players,
@@ -106,54 +127,39 @@
             temas: document.getElementById("temasInput").value,
             qtdImpostores: document.getElementById("impostoresSelect").value
         };
-        // Salva tudo no navegador do celular
         localStorage.setItem("impostorData", JSON.stringify(dados));
     }
 
     function carregarDados() {
         const dadosSalvos = localStorage.getItem("impostorData");
-        
         if (dadosSalvos) {
             const dados = JSON.parse(dadosSalvos);
-
-            // 1. Recupera jogadores
             if (dados.listaJogadores && dados.listaJogadores.length > 0) {
                 players = dados.listaJogadores;
-                // Garante que tenha pelo menos 3 campos mesmo se salvou errado
                 while (players.length < 3) players.push(""); 
             }
-
-            // 2. Recupera Modo
             if (dados.modo) {
                 document.getElementById("modoSelect").value = dados.modo;
                 toggleTema(dados.modo);
             }
-
-            // 3. Recupera Temas
             if (dados.temas) {
                 document.getElementById("temasInput").value = dados.temas;
             }
-
-            // 4. Recupera Qtd Impostores
             if (dados.qtdImpostores) {
                 document.getElementById("impostoresSelect").value = dados.qtdImpostores;
             }
         }
     }
 
-    // Função para o botão de lixeira (Resetar)
     function resetarTudo() {
         if(confirm("Deseja limpar todos os nomes e configurações?")) {
             localStorage.removeItem("impostorData");
-            location.reload(); // Recarrega a página zerada
+            location.reload();
         }
     }
 
-    // ===== INICIALIZAÇÃO =====
-    // Tenta carregar dados salvos ao abrir a página
     carregarDados();
     render();
-
 </script>
 </body>
 </html>

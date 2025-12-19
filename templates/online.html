@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Impostor Online</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+
+<div class="container">
+    
+    <div id="tela-login" class="center">
+        <h1>🌍 Modo Online</h1>
+        <div style="width: 100%;">
+            <input type="text" id="nick" placeholder="Seu Nome" maxlength="12" style="width:100%; margin-bottom:10px; box-sizing: border-box;">
+            <button class="btn" onclick="criar()">Criar Sala</button>
+            <div style="margin:10px; opacity:0.5">ou</div>
+            <input type="text" id="codInput" placeholder="Código da Sala" style="text-transform:uppercase; width:100%; margin-bottom:10px; box-sizing: border-box;">
+            <button class="btn" style="background-color:#444" onclick="entrar()">Entrar na Sala</button>
+        </div>
+        <a href="/" style="margin-top:20px; color:#aaa; text-decoration:none; font-size: 14px;">🏠 Voltar ao Menu Solo</a>
+    </div>
+
+    <div id="tela-lobby" style="display:none" class="center">
+        <p>Código da Sala:</p>
+        <h1 id="dispCod" style="font-size:45px; color:#00d4ff; margin: 10px 0;">----</h1>
+        
+        <div id="listaJogadores" style="width:100%; margin:20px 0; background: rgba(255,255,255,0.05); border-radius: 10px;"></div>
+        
+        <div id="painelDono" style="display:none; width:100%;">
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                <h3 style="margin-top:0; font-size:16px;">⚙️ Configurações</h3>
+                <select id="modoSelectOnline" onchange="toggleTemaOnline(this.value)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; background:#222; color:white; border:1px solid #444;">
+                    <option value="classico">Modo Clássico</option>
+                    <option value="personalizado">Modo Personalizado</option>
+                </select>
+                <div id="temaBoxOnline" style="display:none">
+                    <textarea id="temasInputOnline" placeholder="Temas separados por vírgula" style="width:100%; height:60px; padding:10px; border-radius:5px; background:#111; color:#00d4ff; border:1px solid #444; box-sizing:border-box;"></textarea>
+                </div>
+            </div>
+            <button class="btn" onclick="iniciar()">▶️ Iniciar Partida</button>
+        </div>
+        <p id="msgEsp" style="opacity:0.6">Aguardando o Líder começar...</p>
+    </div>
+
+    <div id="tela-suspense" style="display:none" class="center">
+        <div style="border: 2px dashed #555; padding: 40px 20px; border-radius: 15px; width: 100%; cursor: pointer;" onclick="revelarMeuPapel()">
+            <h2>🔒 Papel Recebido!</h2>
+            <h1 style="margin: 20px 0;">Toque para revelar</h1>
+            <p style="opacity:0.8; font-size: 14px;">Certifique-se que ninguém está olhando.</p>
+        </div>
+    </div>
+
+    <div id="tela-revelar" style="display:none" class="center">
+        <h1 id="textoPapel" style="font-size: 32px; margin-bottom: 10px;"></h1>
+        <div id="boxDiscussao" style="background: rgba(0,212,255,0.1); padding: 15px; border-radius: 10px; width: 100%; margin: 20px 0;">
+            <p id="msgComeca" style="color:#00d4ff; font-weight:bold; margin: 0;"></p>
+        </div>
+        <div id="painelDonoFim" style="display:none; width:100%;">
+            <button class="btn danger" onclick="socket.emit('finalizar_partida', {codigo:meuCod})">🏁 Encerrar e Revelar</button>
+        </div>
+        <p id="msgEspFim" style="opacity:0.6; font-size: 14px;">Aguardando o líder encerrar...</p>
+    </div>
+
+    <div id="tela-resultado" style="display:none" class="center">
+        <h1>🏁 Fim de Jogo</h1>
+        <p style="margin-bottom: 5px; opacity: 0.7;">🎯 O Tema era:</p>
+        <h2 id="resTema" style="color: #00d4ff; margin-bottom: 20px;"></h2>
+        <p style="margin-bottom: 5px; opacity: 0.7;">🕵️ Impostores:</p>
+        <h2 id="resImps" style="color: #ff4444;"></h2>
+        <div id="painelDonoRecomecar" style="display:none; width:100%;">
+            <button class="btn" onclick="iniciar()">🔁 Jogar Novamente</button>
+        </div>
+        <a href="/" class="btn" style="background-color:#444; margin-top: 10px;">🏠 Sair</a>
+    </div>
+
+</div>
+
+<script>
+    const socket = io();
+    let meuCod = "", souDono = false, jogoIniciado = false, dadosPapel = null;
+
+    function esconderTodas() {
+        document.querySelectorAll('.center').forEach(div => div.style.display = "none");
+    }
+
+    function toggleTemaOnline(v) {
+        document.getElementById("temaBoxOnline").style.display = v === "personalizado" ? "block" : "none";
+    }
+
+    function criar() {
+        let n = document.getElementById('nick').value.trim();
+        if(n) socket.emit('criar_sala', {nome:n});
+    }
+
+    function entrar() {
+        let n = document.getElementById('nick').value.trim();
+        let c = document.getElementById('codInput').value.trim().toUpperCase();
+        if(n && c) socket.emit('entrar_sala', {nome:n, codigo:c});
+    }
+
+    function iniciar() {
+        const modo = document.getElementById("modoSelectOnline").value;
+        const temas = document.getElementById("temasInputOnline").value;
+        socket.emit('iniciar_online', {codigo: meuCod, modo: modo, temas: temas});
+    }
+
+    function remover(nome) {
+        if(confirm("Expulsar " + nome + "?")) socket.emit('remover_jogador', {codigo:meuCod, nome_alvo:nome});
+    }
+
+    socket.on('sala_criada', d => meuCod = d.codigo);
+    socket.on('entrou_na_sala', d => meuCod = d.codigo);
+
+    socket.on('atualizar_jogadores', d => {
+        if (jogoIniciado) return;
+        esconderTodas();
+        document.getElementById("tela-lobby").style.display = "flex";
+        document.getElementById("dispCod").innerText = meuCod;
+        souDono = (d.dono_id === socket.id);
+        document.getElementById("painelDono").style.display = souDono ? "block" : "none";
+        document.getElementById("msgEsp").style.display = souDono ? "none" : "block";
+        document.getElementById("listaJogadores").innerHTML = d.jogadores.map((p, i) => {
+            let btnX = (souDono && i !== 0) ? `<button onclick="remover('${p}')" style="background:none; border:none; color:red; margin-left:10px; cursor:pointer;">[X]</button>` : '';
+            return `<div style="padding:10px; border-bottom:1px solid #333">${i===0?'👑 ':''}${p}${btnX}</div>`;
+        }).join('');
+    });
+
+    socket.on('receber_papel', d => {
+        jogoIniciado = true;
+        dadosPapel = d;
+        esconderTodas();
+        document.getElementById("tela-suspense").style.display = "flex";
+    });
+
+    function revelarMeuPapel() {
+        esconderTodas();
+        document.getElementById("tela-revelar").style.display = "flex";
+        document.getElementById("textoPapel").innerText = dadosPapel.msg;
+        document.getElementById("msgComeca").innerText = "🗣️ Quem começa: " + dadosPapel.quem_comeca;
+        document.getElementById("painelDonoFim").style.display = souDono ? "block" : "none";
+        document.getElementById("msgEspFim").style.display = souDono ? "none" : "block";
+    }
+
+    socket.on('revelar_online', d => {
+        esconderTodas();
+        document.getElementById("tela-resultado").style.display = "flex";
+        document.getElementById("resTema").innerText = d.palavra;
+        document.getElementById("resImps").innerText = d.impostores.join(", ");
+        document.getElementById("painelDonoRecomecar").style.display = souDono ? "block" : "none";
+        jogoIniciado = false;
+    });
+
+    socket.on('expulso', () => { alert("Removido!"); window.location.href="/"; });
+    socket.on('erro', m => alert(m));
+</script>
+</body>
+</html>
